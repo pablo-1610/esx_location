@@ -1,5 +1,7 @@
 local ESX, cat, title, desc, isMenuOpened, serverInteraction = nil, "location", "Location", "~b~Louez un véhicule", false, false
 
+local cam
+
 local function customGroupDigits(value)
 	local left,num,right = string.match(value,'^([^%d]*%d)(%d*)(.-)$')
 	return left..(num:reverse():gsub('(%d%d%d)','%1' .. "."):reverse())..right
@@ -15,6 +17,8 @@ local function createMenuPanes()
     RMenu:Get(cat, sub("main")).Closed = function()
         FreezeEntityPosition(PlayerPedId(), false)
         RenderScriptCams(0, 1, 5000, 0, 0)
+        SetCamActive(cam, false)
+        DestroyCam(cam, false)
         if DoesEntityExist(vehicle) then DeleteEntity(vehicle) end
         Wait(5000)
         isMenuOpened = false
@@ -24,9 +28,10 @@ local function createMenuPanes()
     RMenu:Get(cat, sub("confirm")).Closed = function()
     end
 end
--- 
+--
 local function openMenu()
-    local cam, camOk = CreateCam("DEFAULT_SCRIPTED_CAMERA", false), false
+    local camOk = false
+    cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", false)
     local selectedVehicle = 0
     local heading = 0
     SetCamActive(cam, true)
@@ -192,6 +197,8 @@ AddEventHandler("location:cb", function(sucess, message, vehicleData)
         local model = GetHashKey(vehicleData.model) 
         FreezeEntityPosition(PlayerPedId(), false)
         RenderScriptCams(0, 0, 0, 0, 0)
+        SetCamActive(cam, false)
+        DestroyCam(cam, false)
         if DoesEntityExist(vehicle) then DeleteEntity(vehicle) end
         local vehicle = CreateVehicle(model, spawn.coords, spawn.heading, true, false)
         SetVehicleCustomPrimaryColour(vehicle, r, g, b)
